@@ -1,0 +1,12 @@
+# For OpenSfM
+numpy==1.20.1
+scipy==1.6.0
+networkx==2.5
+pyyaml==5.4.1
+exifread==2.3.2
+
+# For sample scripts
+click==7.1.2
+tqdm==4.56.0
+opencv-python==4.5.1.48
+
