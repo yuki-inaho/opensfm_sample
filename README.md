@@ -11,9 +11,7 @@ pip3 install -r requirements.txt
 
 3. Build OpenSfM
 Read below the official document.
-```
 https://opensfm.readthedocs.io/en/latest/building.html#install-dependencies
-```
 
 4. Convert MP4 file
 ```
