@@ -11,7 +11,7 @@ from scripts.utils import make_output_dir
 @click.option("--viewer-mode", "-v", is_flag=True)
 def main(input_mp4_path, output_dir, viewer_mode):
     output_dir_path = Path(output_dir)
-    make_output_dir(output_dir_path)
+    make_output_dir(output_dir_path, clean=True)
     cap = cv2.VideoCapture(input_mp4_path)
     
     n_flames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))

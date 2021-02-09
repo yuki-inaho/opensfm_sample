@@ -11,7 +11,7 @@ from scripts.utils import make_output_dir
 @click.option("--output-project-dir", "-o", default="./project")
 def main(input_image_dir, config_directory_path, output_project_dir):
     output_project_dir_path = Path(output_project_dir)
-    make_output_dir(output_project_dir_path)
+    make_output_dir(output_project_dir_path, clean=True)
 
     # copy image directory
     shutil.copytree(input_image_dir, output_project_dir_path.joinpath("images"))
