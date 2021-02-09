@@ -1,14 +1,8 @@
 import click
 import cv2
-import shutil
 from tqdm import trange
-from pathlib import Path, PosixPath
-
-
-def make_output_dir(output_image_dir_path: PosixPath):
-    if output_image_dir_path.exists():
-        shutil.rmtree(str(output_image_dir_path))
-    output_image_dir_path.mkdir()
+from pathlib import Path
+from scripts.utils import make_output_dir
 
 
 @click.command()
@@ -25,7 +19,7 @@ def main(input_mp4_path, output_dir, viewer_mode):
 
     for i in trange(n_flames):
         ret, frame = cap.read()
-        image_name = f"{i:0=5}.jpg"
+        image_name = f"{i:0=3}.jpg"
         output_image_path = str(output_dir_path.joinpath(image_name))
         cv2.imwrite(output_image_path, frame)
 

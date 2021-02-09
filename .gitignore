@@ -2,3 +2,4 @@ pyproject.toml
 *.pyc
 .venv/
 images/
+project/
