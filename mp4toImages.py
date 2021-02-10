@@ -1,5 +1,6 @@
 import click
 import cv2
+import numpy as np
 from tqdm import trange
 from pathlib import Path
 from scripts.utils import make_output_dir
@@ -10,19 +11,25 @@ from scripts.utils import make_output_dir
 @click.option("--output-dir", "-o", default="images")
 @click.option("--viewer-mode", "-v", is_flag=True)
 @click.option("--resize-rate", "-r", default=1.0)
-def main(input_mp4_path, output_dir, viewer_mode, resize_rate):
+@click.option("--subsample-rate", "-sub", default=1.0)
+def main(input_mp4_path, output_dir, viewer_mode, resize_rate, subsample_rate):
     output_dir_path = Path(output_dir)
     make_output_dir(output_dir_path, clean=True)
     cap = cv2.VideoCapture(input_mp4_path)
-    
+
     n_flames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     print(f"Number of Frame: {n_flames}")
 
+    index_list = np.arange(1, n_flames, int(1 / subsample_rate))
+
     for i in trange(n_flames):
         ret, frame = cap.read()
+
+        if i not in index_list:
+            continue
         image_name = f"{i:0=3}.jpg"
         output_image_path = str(output_dir_path.joinpath(image_name))
-        frame = frame if resize_rate == 1.0 else cv2.resize(frame, (int(frame.shape[1]*resize_rate), int(frame.shape[0]*resize_rate)))
+        frame = frame if resize_rate == 1.0 else cv2.resize(frame, (int(frame.shape[1] * resize_rate), int(frame.shape[0] * resize_rate)))
         cv2.imwrite(output_image_path, frame)
         if not ret:
             break
