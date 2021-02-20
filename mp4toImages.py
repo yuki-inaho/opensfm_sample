@@ -18,11 +18,13 @@ def main(input_mp4_path, output_dir, viewer_mode, resize_rate, subsample_rate):
     cap = cv2.VideoCapture(input_mp4_path)
 
     n_flames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    print(f"Number of Frame: {n_flames}")
+    print(f"Number of (Raw) Frame: {n_flames}")
 
     index_list = np.arange(1, n_flames, int(1 / subsample_rate))
+    n_flames_subsampled = len(index_list)
+    print(f"Number of Frame: {n_flames_subsampled}")
 
-    for i in trange(n_flames):
+     for i in trange(n_flames):
         ret, frame = cap.read()
 
         if i not in index_list:
@@ -40,7 +42,6 @@ def main(input_mp4_path, output_dir, viewer_mode, resize_rate, subsample_rate):
     cap.release()
     if viewer_mode:
         cv2.destroyAllWindows()
-
 
 if __name__ == "__main__":
     main()
