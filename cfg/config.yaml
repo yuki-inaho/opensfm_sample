@@ -5,7 +5,7 @@
 use_exif_size: no
 processes: 8                  # Number of threads to use
 feature_type: AKAZE
-depthmap_min_consistent_views: 5      # Min number of views that should reconstruct a point for it to be valid
+depthmap_min_consistent_views: 10      # Min number of views that should reconstruct a point for it to be valid
 feature_process_size: 1024
 #bundle_use_gcp: yes
 matching_use_filters: yes

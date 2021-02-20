@@ -24,7 +24,7 @@ def main(input_mp4_path, output_dir, viewer_mode, resize_rate, subsample_rate):
     n_flames_subsampled = len(index_list)
     print(f"Number of Frame: {n_flames_subsampled}")
 
-     for i in trange(n_flames):
+    for i in trange(n_flames):
         ret, frame = cap.read()
 
         if i not in index_list:
