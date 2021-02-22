@@ -29,7 +29,7 @@ def main(input_mp4_path, output_dir, viewer_mode, resize_rate, subsample_rate):
 
         if i not in index_list:
             continue
-        image_name = f"{i:0=3}.jpg"
+        image_name = f"{i:0=3}.png"
         output_image_path = str(output_dir_path.joinpath(image_name))
         frame = frame if resize_rate == 1.0 else cv2.resize(frame, (int(frame.shape[1] * resize_rate), int(frame.shape[0] * resize_rate)))
         cv2.imwrite(output_image_path, frame)
