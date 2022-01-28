@@ -93,13 +93,14 @@ def extract_rgbd_result(rgb_dir_path, depth_dir_path, max_depth_configuration):
 
 @click.command()
 @click.option("--input-dir", "-i", default="./project")
-@click.option("--output-dir", "-o", default="rgbd")
+@click.option("--output-dir-name", "-o", default="rgbd")
 @click.option("--max-depth-configuration", "-m", default=100.0)
-def main(input_dir, output_dir, max_depth_configuration):
-    output_dir_path = Path(output_dir)
+def main(input_dir, output_dir_name, max_depth_configuration):
+    output_dir_path = Path(input_dir).joinpath(output_dir_name)
     make_output_dir(output_dir_path, clean=True)
     make_output_dir(output_dir_path.joinpath("rgb"))
     make_output_dir(output_dir_path.joinpath("depth"))
+    make_output_dir(output_dir_path.joinpath("depth_colorized"))
 
     input_dir_path = Path(input_dir)
     rgb_dir_path = input_dir_path.joinpath("undistorted/images")
@@ -113,7 +114,7 @@ def main(input_dir, output_dir, max_depth_configuration):
     for rgbd_obj in tqdm(rgbd_depth_obj_list):
         rgb_save_path = output_dir_path.joinpath("rgb", f"{rgbd_obj.rgb_name}")
         depth_save_path = output_dir_path.joinpath("depth", f"{rgbd_obj.depth_name}")
-        depth_colorized_save_path = output_dir_path.joinpath("depth", f"{rgbd_obj.depth_colorized_name}")
+        depth_colorized_save_path = output_dir_path.joinpath("depth_colorized", f"{rgbd_obj.depth_colorized_name}")
 
         cv2.imwrite(str(rgb_save_path), rgbd_obj.rgb)
         cv2.imwrite(str(depth_save_path), rgbd_obj.depth)
