@@ -105,9 +105,10 @@ def main(input_dir, output_dir, max_depth_configuration):
     rgb_dir_path = input_dir_path.joinpath("undistorted/images")
     depth_dir_path = input_dir_path.joinpath("undistorted/depthmaps")
 
-    # Load RGB and Depth info
+    """Load RGB and Depth info
+    """
+    # @TODO: generate rgbd_obj sequentially, to reduce memory use
     rgbd_depth_obj_list = extract_rgbd_result(rgb_dir_path, depth_dir_path, max_depth_configuration)
-
     print("Saving images ...")
     for rgbd_obj in tqdm(rgbd_depth_obj_list):
         rgb_save_path = output_dir_path.joinpath("rgb", f"{rgbd_obj.rgb_name}")
@@ -119,7 +120,8 @@ def main(input_dir, output_dir, max_depth_configuration):
         cv2.imwrite(str(depth_colorized_save_path), rgbd_obj.depth_colorized)
         cv2.waitKey(10)
 
-    # Dump meta information
+    """ Dump meta information
+    """
     with open(input_dir_path.joinpath("camera_models.json"), "r") as f:
         _camera_models = json.load(f)
         camera_models = [val for val in _camera_models.values()][0]
