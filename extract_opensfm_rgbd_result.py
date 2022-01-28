@@ -1,15 +1,9 @@
 import cv2
-import re
 import click
-import yaml
 import numpy as np
-import pickle
-from numpy import ndarray
-from tqdm import trange
 from pathlib import Path
 from tqdm import tqdm
 from scripts.utils import make_output_dir
-import pdb
 import json
 
 
@@ -29,14 +23,15 @@ def colorize_int_image(img, max_var=1024):
 
 
 class RGBDImage:
-    def __init__(self, rgb_image_path, depth_image_path, max_depth=120):
+    def __init__(self, rgb_image_path, depth_image_path, max_depth=100):
         self._rgb_image_path = rgb_image_path
         self._depth_image_path = depth_image_path
         self._rgb_image = cv2.imread(str(rgb_image_path))
         self._image_height, self._image_width, _ = self._rgb_image.shape
         depth_npz = np.load(depth_image_path)
         depth_image_normalized = depth_npz["depth"] / max_depth
-        depth_image_uc1 = np.floor(depth_image_normalized * 1024).astype(np.uint8)
+        depth_image_normalized = np.clip(depth_image_normalized, 0, 1.0)
+        depth_image_uc1 = np.floor(depth_image_normalized * 1024).astype(np.int16)
         depth_image_resized = cv2.resize(depth_image_uc1, self.image_size)
         self._depth_image = depth_image_resized
         self._depth_image_colorized = colorize_int_image(self._depth_image, max_depth)
@@ -61,7 +56,7 @@ class RGBDImage:
     @property
     def rgb_name(self):
         suf = Path(self._rgb_image_path).suffix
-        return Path(self._rgb_image_path).stem.replace(suf, ".jpg")
+        return Path(self._rgb_image_path).name.replace(suf, ".jpg")
 
     @property
     def depth_name(self):
@@ -79,23 +74,19 @@ class RGBDImage:
 def extract_rgbd_result(rgb_dir_path, depth_dir_path, max_depth_configuration):
     rgbd_obj_list = []
 
-    rgb_path_list = [
-        path for path in rgb_dir_path.glob("*")
-        if path.suffix in [".png", ".jpg", ".jpeg"]
-    ]
+    rgb_path_list = [path for path in rgb_dir_path.glob("*") if path.suffix in [".png", ".jpg", ".jpeg"]]
 
     print("Data is loading...")
     for rgb_image_path in tqdm(rgb_path_list):
         rgb_image_name = rgb_image_path.name
         image_height, image_width, _ = cv2.imread(str(rgb_image_path)).shape
-        pattern = r".*\..*(\.+.*)"
-        true_suffix = re.match(pattern, rgb_image_name).group(1)
-        rgb_image_name_without_osfm_suffix = rgb_image_name[:-len(true_suffix)]
         depth_image_path = Path(
-            depth_dir_path, rgb_image_name_without_osfm_suffix + ".clean.npz")
+            depth_dir_path,
+            rgb_image_name + ".clean.npz",
+        )
 
         # print([key for key in depth_npz.keys()])  -> 'depth', 'plane', 'score'
-        rgbd_obj = RGBDImage(rgb_image_path, depth_image_path, max_depth = max_depth_configuration)
+        rgbd_obj = RGBDImage(rgb_image_path, depth_image_path, max_depth=max_depth_configuration)
         rgbd_obj_list.append(rgbd_obj)
     return rgbd_obj_list
 
@@ -103,7 +94,7 @@ def extract_rgbd_result(rgb_dir_path, depth_dir_path, max_depth_configuration):
 @click.command()
 @click.option("--input-dir", "-i", default="./project")
 @click.option("--output-dir", "-o", default="rgbd")
-@click.option("--max-depth-configuration", "-m", default=120.0)
+@click.option("--max-depth-configuration", "-m", default=100.0)
 def main(input_dir, output_dir, max_depth_configuration):
     output_dir_path = Path(output_dir)
     make_output_dir(output_dir_path, clean=True)
@@ -132,7 +123,12 @@ def main(input_dir, output_dir, max_depth_configuration):
     with open(input_dir_path.joinpath("camera_models.json"), "r") as f:
         _camera_models = json.load(f)
         camera_models = [val for val in _camera_models.values()][0]
-    info_dict = {"max_depth": max_depth_configuration, "width": camera_models["width"], "height": camera_models["height"], "focal": camera_models["focal"]}
+    info_dict = {
+        "max_depth": max_depth_configuration,
+        "width": camera_models["width"],
+        "height": camera_models["height"],
+        "focal": camera_models["focal"],
+    }
     output_json_path = str(output_dir_path.joinpath("meta.json"))
     with open(output_json_path, "w") as f:
         json.dump(info_dict, f)

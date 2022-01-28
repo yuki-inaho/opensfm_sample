@@ -3,10 +3,14 @@
 # Set here any parameter that you want to override for this dataset
 # For example:
 use_exif_size: no
-processes: 8                  # Number of threads to use
-feature_type: AKAZE
-depthmap_min_consistent_views: 10      # Min number of views that should reconstruct a point for it to be valid
-feature_process_size: 1024
-#bundle_use_gcp: yes
+
+# Params for features
+feature_type: HAHOG                     # Feature type (AKAZE, SURF, SIFT, HAHOG, ORB)
+feature_root: 1                         # If 1, apply square root mapping to features
+feature_min_frames: 8000                # If fewer frames are detected, sift_peak_threshold/surf_hessian_threshold is reduced.
+depthmap_min_consistent_views: 8      # Min number of views that should reconstruct a point for it to be valid
 matching_use_filters: yes
 feature_use_adaptive_suppression: yes
+
+processes: 8
+depthmap_method: PATCH_MATCH_SAMPLE
